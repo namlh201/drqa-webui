@@ -9,8 +9,9 @@
 import torch
 import os
 
-from drqa import pipeline
-from drqa.retriever import utils
+from .drqa_transformers_service import DrQATransformersService
+from .pyserini_transformers_service import PyseriniTransformersService
+
 import logging
 
 logger = logging.getLogger()
@@ -20,15 +21,18 @@ console = logging.StreamHandler()
 console.setFormatter(fmt)
 logger.addHandler(console)
 
-drqa_data_directory = '../DrQA/data'
+drqa_data_directory = '../data'
 
 config = {
-    'reader-model': os.path.join(drqa_data_directory, 'reader', 'multitask.mdl'),
-    'retriever-model': os.path.join(drqa_data_directory, 'wikipedia', 'docs-tfidf-ngram=2-hash=16777216-tokenizer=simple.npz'),
-    'doc-db': os.path.join(drqa_data_directory, 'wikipedia', 'docs.db'),
-    'embedding-file': None,
-    'tokenizer': 'spacy',
-    'no-cuda': True,
+    'reader-model': 'distilbert-base-cased-distilled-squad',
+    'use-fast-tokenizer': True,
+    'retriever-model': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs-tfidf-ngram=1-hash=16777216-tokenizer=spacy.npz'),
+    'doc-db': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs.db'),
+    'index-path': os.path.join(drqa_data_directory, 'index', 'lucene-index.enwiki-20180701-paragraphs'),
+    'group-length': 500,
+    'batch-size': 32,
+    'num-workers': 2,
+    'cuda': False,
     'gpu': 0
 }
 
@@ -40,31 +44,14 @@ else:
     logger.info('Running on CPU only.')
 
 logger.info('Initializing pipeline...')
-DrQA = pipeline.DrQA(
-    cuda=cuda,
-    reader_model=config['reader-model'],
-    ranker_config={'options': {'tfidf_path': config['retriever-model']}},
-    db_config={'options': {'db_path': config['doc-db']}},
-    tokenizer=config['tokenizer'],
-    embedding_file=config['embedding-file'],
-)
+
+class Services:
+    def __init__(self, retriever='tfidf'):
+        if retriever == 'tfidf':
+            self.DrQA = DrQATransformersService(config)
+        elif retriever == 'serini-bm25':
+            self.DrQA = PyseriniTransformersService(config)
 
 
-def process(question, candidates=None, top_n=1, n_docs=5):
-    predictions = DrQA.process(
-        question, candidates, top_n, n_docs, return_context=True
-    )
-    answers = []
-    for i, p in enumerate(predictions, 1):
-        answers.append({
-            'index': i,
-            'span': p['span'],
-            'doc_id': p['doc_id'],
-            'span_score': '%.5g' % p['span_score'],
-            'doc_score': '%.5g' % p['doc_score'],
-            'text': p['context']['text'],
-            'start': p['context']['start'],
-            'end': p['context']['end']
-        })
-    return answers
-
+    def process(self, question, top_n=1, n_docs=5):
+        return self.DrQA.process(question, top_n, n_docs)
