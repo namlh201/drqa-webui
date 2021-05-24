@@ -28,20 +28,23 @@ if settings.USE_NGROK:
     # Update any base URLs or webhooks to use the public ngrok URL
     settings.BASE_URL = public_url
     
-from services import Services
+from services import Service
 
-def app(retriever='tfidf'):
+def app(retriever='tfidf', lang='en'):
     app = Flask(__name__)
-    services = Services(retriever)
+    service = Service(retriever, lang)
 
     @app.route("/")
     def index():
-        return render_template('index.html')
+        if lang == 'en':
+            return render_template('index.html')
+        elif lang == 'vi':
+            return render_template('index_vi.html')
 
     @app.route("/query", methods=["POST"])
     def query():
         data = request.json
-        answers = services.process(question=data['question'])
+        answers = service.process(question=data['question'])
         return json.dumps(answers)
 
     return app

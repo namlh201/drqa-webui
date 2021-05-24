@@ -26,9 +26,18 @@ drqa_data_directory = '../data'
 config = {
     'reader-model': 'distilbert-base-cased-distilled-squad',
     'use-fast-tokenizer': True,
-    'retriever-model': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs-tfidf-ngram=1-hash=16777216-tokenizer=spacy.npz'),
-    'doc-db': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs.db'),
-    'index-path': os.path.join(drqa_data_directory, 'index', 'lucene-index.enwiki-20180701-paragraphs'),
+    'retriever-model': {
+        'en': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs-tfidf-ngram=1-hash=16777216-tokenizer=spacy.npz'),
+        'vi': os.path.join(drqa_data_directory, 'wikipedia_using/vi', 'docs-tfidf-ngram=1-hash=262144-tokenizer=spacy_vi.npz')
+    },
+    'doc-db': {
+        'en': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs.db'),
+        'vi': os.path.join(drqa_data_directory, 'wikipedia_using/vi', 'docs.db')
+    },
+    'index-path': {
+        'en': os.path.join(drqa_data_directory, 'index', 'lucene-index.enwiki-20180701-paragraphs'),
+        'vi': os.path.join(drqa_data_directory, 'index', 'lucene-index.viwiki-20210501-paragraphs')
+    },
     'group-length': 500,
     'batch-size': 32,
     'num-workers': 2,
@@ -45,12 +54,12 @@ else:
 
 logger.info('Initializing pipeline...')
 
-class Services:
-    def __init__(self, retriever='tfidf'):
+class Service:
+    def __init__(self, retriever='tfidf', lang='en'):
         if retriever == 'tfidf':
-            self.DrQA = DrQATransformersService(config)
+            self.DrQA = DrQATransformersService(config, lang)
         elif retriever == 'serini-bm25':
-            self.DrQA = PyseriniTransformersService(config)
+            self.DrQA = PyseriniTransformersService(config, lang)
 
 
     def process(self, question, top_n=1, n_docs=5):

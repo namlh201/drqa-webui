@@ -1,11 +1,11 @@
 from drqa import pipeline
 
 class PyseriniTransformersService():
-    def __init__(self, config):
+    def __init__(self, config, lang):
         self.pipeline = pipeline.PyseriniTransformersQA(
             reader_model=config['reader-model'],
             use_fast_tokenizer=config['use-fast-tokenizer'],
-            index_path=config['index-path'],
+            index_path=config['index-path'][lang],
             batch_size=config['batch-size'],
             cuda=config['cuda'],
             num_workers=config['num-workers'],

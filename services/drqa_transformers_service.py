@@ -1,7 +1,7 @@
 from drqa import pipeline
 
 class DrQATransformersService():
-    def __init__(self, config):
+    def __init__(self, config, lang):
         self.pipeline = pipeline.DrQATransformers(
             reader_model=config['reader-model'],
             use_fast_tokenizer=config['use-fast-tokenizer'],
@@ -9,10 +9,10 @@ class DrQATransformersService():
             batch_size=config['batch-size'],
             cuda=config['cuda'],
             num_workers=config['num-workers'],
-            db_config={'options': {'db_path': config['doc-db']}},
+            db_config={'options': {'db_path': config['doc-db'][lang]}},
             ranker_config={
                 'options': {
-                    'tfidf_path': config['retriever-model'],
+                    'tfidf_path': config['retriever-model'][lang],
                     'strict': False
                 }
             },
