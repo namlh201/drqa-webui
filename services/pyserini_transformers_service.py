@@ -3,9 +3,10 @@ from drqa import pipeline
 class PyseriniTransformersService():
     def __init__(self, config, lang):
         self.pipeline = pipeline.PyseriniTransformersQA(
-            reader_model=config['reader-model'],
+            reader_model=config['reader-model'][lang],
             use_fast_tokenizer=config['use-fast-tokenizer'],
             index_path=config['index-path'][lang],
+            index_lan=lang,
             batch_size=config['batch-size'],
             cuda=config['cuda'],
             num_workers=config['num-workers'],

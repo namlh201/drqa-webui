@@ -24,11 +24,14 @@ logger.addHandler(console)
 drqa_data_directory = '../data'
 
 config = {
-    'reader-model': 'distilbert-base-cased-distilled-squad',
+    'reader-model': {
+        'en': 'distilbert-base-cased-distilled-squad',
+        'vi': os.path.join(drqa_data_directory, 'model', 'output-xlm-roberta-base-mlqa-xquad-vi-wiki')
+    },
     'use-fast-tokenizer': True,
     'retriever-model': {
         'en': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs-tfidf-ngram=1-hash=16777216-tokenizer=spacy.npz'),
-        'vi': os.path.join(drqa_data_directory, 'wikipedia_using/vi', 'docs-tfidf-ngram=1-hash=262144-tokenizer=spacy_vi.npz')
+        'vi': os.path.join(drqa_data_directory, 'wikipedia_using/vi', 'docs-tfidf-ngram=1-hash=16777216-tokenizer=coccoc.npz')
     },
     'doc-db': {
         'en': os.path.join(drqa_data_directory, 'wikipedia_using/en', 'docs.db'),
@@ -60,6 +63,8 @@ class Service:
             self.DrQA = DrQATransformersService(config, lang)
         elif retriever == 'serini-bm25':
             self.DrQA = PyseriniTransformersService(config, lang)
+        else:
+            raise Exception('Invalid retriever! Must be "tfidf" or "serini-bm25"!')
 
 
     def process(self, question, top_n=1, n_docs=5):

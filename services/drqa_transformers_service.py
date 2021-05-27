@@ -3,7 +3,7 @@ from drqa import pipeline
 class DrQATransformersService():
     def __init__(self, config, lang):
         self.pipeline = pipeline.DrQATransformers(
-            reader_model=config['reader-model'],
+            reader_model=config['reader-model'][lang],
             use_fast_tokenizer=config['use-fast-tokenizer'],
             group_length=config['group-length'],
             batch_size=config['batch-size'],

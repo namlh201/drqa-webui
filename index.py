@@ -18,7 +18,7 @@ if settings.USE_NGROK:
 
     # Get the dev server port (defaults to 8000 for Uvicorn, can be overridden with `--port`
     # when starting the server
-    port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 8000
+    port = sys.argv[sys.argv.index("--bind") + 1] if "--bind" in sys.argv else 8000
 
     # Open a ngrok tunnel to the dev server
     public_url = ngrok.connect(port)

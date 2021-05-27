@@ -46,16 +46,48 @@
           if (answers.length == 0) {
             return
           }
+
+          answer = answers[0]['span']
+
+          text = answers[0]['text']
+          start = answers[0]['start']
+          end = answers[0]['end']
+
+          title = text.split(".")[0].trim()
+          title_path = title.split(" ").join("_")
+
+          before_answer = text.slice(0, start) 
+          body_answer = text.slice(start, end)
+          after_answer = text.slice(end)
+
           var templateResponse = Handlebars.compile($("#message-response-template").html());
           response = '<strong>' + answers[0]['span'] + 
               '</strong> from <a href="https://en.wikipedia.org/wiki/' +
               answers[0]['doc_id'] + '">' + answers[0]['doc_id'] + '</a>';
-          var contextResponse = {
-            answer: answers[0]['span'],
-            doc_id: answers[0]['doc_id'],
-            context: answers[0]['text'],
-            time: instance.getCurrentTime()
-          };
+          
+          if (answer !== "") {
+            var contextResponse = {
+              // answer: answers[0]['span'],
+              // doc_id: answers[0]['doc_id'],
+              before_answer: before_answer,
+              body_answer: body_answer,
+              after_answer: after_answer,
+              title: title,
+              title_path: title_path,
+              time: instance.getCurrentTime()
+            };
+          } else {
+            var contextResponse = {
+              // answer: answers[0]['span'],
+              // doc_id: answers[0]['doc_id'],
+              before_answer: "",
+              body_answer: "Could not find any answer for that question!",
+              after_answer: "",
+              title: "",
+              title_path: "",
+              time: instance.getCurrentTime()
+            };
+          }
           instance.$chatHistoryList.append(templateResponse(contextResponse));
           instance.scrollToBottom();
         });

@@ -6,31 +6,13 @@
   <title>DrQA Tiếng Việt</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
 </head>
 
 <body>
-    <div class="container clearfix">
-    <div class="people-list" id="people-list">
-      <div class="search">
-        <input type="text" placeholder="Tìm kiếm" />
-        <i class="fa fa-search"></i>
-      </div>
-      <ul class="list">
-        <li class="clearfix">
-          <img src="/static/images/wikipedia.png" class="avatar" alt="avatar" />
-          <div class="about">
-            <div class="name">Wikipedia (vi)</div>
-            <div class="status">
-              <i class="fa fa-circle online"></i> online
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    
-    <div class="chat">
-      <div class="chat-header clearfix">
+  <div class="container clearfix">
+    <div class="chat flex-container">
+      <div style="flex-grow: 1" class="chat-header clearfix">
         <img src="/static/images/wikipedia.png" class="avatar" alt="avatar" />
         
         <div class="chat-about">
@@ -40,7 +22,7 @@
         <!-- <i class="fa fa-star"></i> -->
       </div> <!-- end chat-header -->
       
-      <div class="chat-history">
+      <div style="flex-grow: 6" class="chat-history">
         <ul>
           <!-- <li class="clearfix">
             <div class="message-data align-right">
@@ -98,7 +80,7 @@
         
       </div> <!-- end chat-history -->
       
-      <div class="chat-message clearfix">
+      <div style="flex-grow: 1" class="chat-message clearfix">
         <textarea name="message-to-send" id="message-to-send" placeholder ="Bạn muốn hỏi gì?" rows="3"></textarea>
                 
         <!-- <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
@@ -132,9 +114,13 @@
       <span class="message-data-time">{{time}}, Hôm nay</span>
     </div>
     <div class="message my-message">
-      <span class="message-data-answer">{{answer}}</span>
-      <p class="message-data-context">{{context}}.
-      <a class="message-data-link" href="https://vi.wikipedia.org/wiki/{{doc_id}}">{{doc_id}}</a></p> 
+      <!-- <span class="message-data-answer">{{answer}}</span> -->
+      <p class="message-data-context">
+        {{before_answer}}
+        <span style="color: blue; font-weight: bold">{{body_answer}}</span>
+        {{after_answer}}
+        <a class="message-data-link" href="https://vi.wikipedia.org/wiki/{{title_path}}">{{title}}</a>
+      </p> 
     </div>
   </li>
 </script>
